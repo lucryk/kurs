@@ -23,10 +23,6 @@
                     <a href="{% url 'book_list' %}">Книжный Магазин</a>
                 </div>
 
-                <form action="{% url 'search_books' %}" method="get" class="search-form">
-                    <input type="text" name="q" placeholder="Поиск книг..." value="{{ request.GET.q }}">
-                    <button type="submit">Найти</button>
-                </form>
 
                 <div class="nav-links">
                     <a href="{% url 'book_list' %}">Все книги</a>

@@ -14,10 +14,6 @@ urlpatterns = [
     path('genre/delete/<int:genre_id>/', views.delete_genre, name='delete_genre'),
     path('order/create/', views.create_order, name='create_order'),
     path('order/complete/<int:order_id>/', views.complete_order, name='complete_order'),
-# Добавим в urlpatterns
-path('book/add/', views.add_book, name='add_book'),
-path('book/edit/<int:book_id>/', views.edit_book, name='edit_book'),
-path('book/delete/<int:book_id>/', views.delete_book, name='delete_book'),
     path('book/add/', views.add_book, name='add_book'),
     path('book/edit/<int:book_id>/', views.edit_book, name='edit_book'),
     path('book/delete/<int:book_id>/', views.delete_book, name='delete_book'),

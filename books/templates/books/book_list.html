@@ -4,69 +4,67 @@
 <div class="card">
     <h2>Каталог книг</h2>
 
-    <!-- Форма поиска -->
-    <form action="{% url 'book_list' %}" method="get" class="search-form">
-        <input type="text" name="q" placeholder="Поиск по названию, автору..." value="{{ search_query }}">
-        <button type="submit">Найти</button>
-    </form>
 
-    <!-- Фильтры -->
-    <div class="filters">
-        <div class="filter-group">
-            <label for="genre">Жанр:</label>
-            <select id="genre" name="genre" onchange="this.form.submit()">
-                <option value="">Все жанры</option>
-                {% for genre in genres %}
-                <option value="{{ genre.name }}"
-                    {% if genre.name == selected_genre %}selected{% endif %}>
-                    {{ genre.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="author">Автор:</label>
-            <select id="author" name="author" onchange="this.form.submit()">
-                <option value="">Все авторы</option>
-                {% for author in authors %}
-                <option value="{{ author }}"
-                    {% if author == selected_author %}selected{% endif %}>
-                    {{ author }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label>&nbsp;</label>
-            <a href="{% url 'book_list' %}" class="btn btn-secondary">Сбросить фильтры</a>
-        </div>
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'add_book' %}" class="btn">Добавить новую книгу</a>
     </div>
 
-    <!-- Результаты -->
+    <form method="get" action="{% url 'book_list' %}" id="filter-form">
+        <div class="search-form" style="margin-bottom: 20px;">
+            <input type="text" name="q" placeholder="Поиск по названию, автору..." value="{{ search_query }}">
+            <button type="submit">Найти</button>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="genre">Жанр:</label>
+                <select id="genre" name="genre">
+                    <option value="">Все жанры</option>
+                    {% for genre in genres %}
+                    <option value="{{ genre.name }}"
+                        {% if genre.name == selected_genre %}selected{% endif %}>
+                        {{ genre.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="author">Автор:</label>
+                <select id="author" name="author">
+                    <option value="">Все авторы</option>
+                    {% for author in authors %}
+                    <option value="{{ author }}"
+                        {% if author == selected_author %}selected{% endif %}>
+                        {{ author }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <button type="submit" class="btn">Применить фильтры</button>
+                <a href="{% url 'book_list' %}" class="btn btn-secondary">Сбросить фильтры</a>
+            </div>
+        </div>
+    </form>
+
+
+
     <div class="book-list">
-        {% for book in books %}
+        {% for book in books_page %}
         <div class="book-card">
             <h3>{{ book.title }}</h3>
-            <div class="book-meta">
-                <div><strong>Автор:</strong> {{ book.author }}</div>
-                <div><strong>Год издания:</strong> {{ book.year }}</div>
-                <div class="genre-tag">{{ book.genre.name }}</div>
-            </div>
+            <p><strong>Автор:</strong> {{ book.author }}</p>
+            <p><strong>Год издания:</strong> {{ book.year }}</p>
+            <p><strong>Жанр:</strong> {{ book.genre.name }}</p>
+            <p><strong>Цена:</strong> {{ book.retail_price }} ₽</p>
+            <p><strong>В наличии:</strong> {{ book.stock }}</p>
+            <p><strong>Продано:</strong> {{ book.sold }}</p>
 
-            <div class="book-price">
-                Цена: {{ book.retail_price }} ₽
-            </div>
-
-            <div class="stock-info">
-                <span class="stock-amount">В наличии: {{ book.stock }}</span>
-                <span class="stock-sold">Продано: {{ book.sold }}</span>
-            </div>
-
-            <div class="actions">
-                <a href="{% url 'edit_book' book.id %}" class="btn">Редактировать</a>
-                <a href="{% url 'delete_book' book.id %}" class="btn btn-danger">Удалить</a>
+            <div class="actions" style="margin-top: 10px;">
+                <a href="{% url 'edit_book' book.id %}" class="btn" style="background: #28a745; color: white;">Редактировать</a>
+                <a href="{% url 'delete_book' book.id %}" class="btn" style="background: #dc3545; color: white;">Удалить</a>
             </div>
         </div>
         {% empty %}
@@ -79,23 +77,29 @@
 
     <!-- Пагинация -->
     <div class="pagination">
-        {% if books.has_previous %}
-            <a href="?page=1{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">&laquo; Первая</a>
-            <a href="?page={{ books.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">Предыдущая</a>
+        {% if books_page.has_previous %}
+            <a href="?page=1">&laquo; Первая</a>
+            <a href="?page={{ books_page.previous_page_number }}">Предыдущая</a>
         {% endif %}
 
         <span class="current">
-            Страница {{ books.number }} из {{ books.paginator.num_pages }}
+            Страница {{ books_page.number }} из {{ books_page.paginator.num_pages }}
         </span>
 
-        {% if books.has_next %}
-            <a href="?page={{ books.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">Следующая</a>
-            <a href="?page={{ books.paginator.num_pages }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">Последняя &raquo;</a>
+        {% if books_page.has_next %}
+            <a href="?page={{ books_page.next_page_number }}">Следующая</a>
+            <a href="?page={{ books_page.paginator.num_pages }}">Последняя &raquo;</a>
         {% endif %}
     </div>
-
-    <div style="margin-top: 20px;">
-        <a href="{% url 'add_book' %}" class="btn">Добавить новую книгу</a>
-    </div>
 </div>
+
+<script>
+document.getElementById('genre').addEventListener('change', function() {
+    document.getElementById('filter-form').submit();
+});
+
+document.getElementById('author').addEventListener('change', function() {
+    document.getElementById('filter-form').submit();
+});
+</script>
 {% endblock %}

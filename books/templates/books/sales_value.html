@@ -1,5 +1,5 @@
 {% extends 'books/base.html' %}
-    {% load static %}
+{% load static %}
 {% block content %}
 <div class="card">
     <h2>Стоимость всех продаж</h2>
@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for book in books %}
+            {% for book in books %}  <!-- Исправлено: books вместо css -->
             <tr>
                 <td>{{ book.title }}</td>
                 <td>{{ book.sold }}</td>

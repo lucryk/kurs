@@ -12,33 +12,35 @@ from decimal import Decimal
 
 
 def book_list(request):
-    # Получаем параметры фильтрации из запроса
+    # Получаем параметры фильтрации
     genre_filter = request.GET.get('genre', '')
     author_filter = request.GET.get('author', '')
     search_query = request.GET.get('q', '')
+    page = request.GET.get('page', 1)
 
-    # Начинаем с базового запроса
-    books = Book.objects.all()
+    # Базовый запрос с сортировкой
+    books = Book.objects.all().order_by('title')
 
     # Применяем фильтры
     if genre_filter:
         books = books.filter(genre__name__icontains=genre_filter)
+
     if author_filter:
         books = books.filter(author__icontains=author_filter)
+
     if search_query:
         books = books.filter(
             Q(title__icontains=search_query) |
             Q(author__icontains=search_query) |
-            Q(description__icontains=search_query)
+            Q(genre__name__icontains=search_query)
         )
 
-    # Получаем уникальные жанры и авторов для фильтров
+    # Получаем уникальные значения для фильтров
     genres = Genre.objects.all()
-    authors = Book.objects.values_list('author', flat=True).distinct()
+    authors = Book.objects.order_by('author').values_list('author', flat=True).distinct()
 
     # Пагинация
-    paginator = Paginator(books.order_by('title'), 10)
-    page = request.GET.get('page')
+    paginator = Paginator(books, 10)
 
     try:
         books_page = paginator.page(page)
@@ -47,8 +49,13 @@ def book_list(request):
     except EmptyPage:
         books_page = paginator.page(paginator.num_pages)
 
+    # Отладочный вывод
+    print(f"Всего книг: {books.count()}")
+    if books.exists():
+        print(f"Первая книга: {books[0].title}")
+
     return render(request, 'books/book_list.html', {
-        'css': books_page,
+        'books_page': books_page,  # Было: 'css': books_page
         'genres': genres,
         'authors': authors,
         'selected_genre': genre_filter,
@@ -99,31 +106,29 @@ def missing_books(request):
 
 
 def sales_value(request):
-    try:
-        # Рассчитываем общую стоимость
-        total_value = Decimal('0.00')
-        for book in Book.objects.all():
-            total_value += book.sold * book.retail_price
+    # Рассчитываем общую стоимость с помощью агрегации БД
+    total_value = Book.objects.aggregate(
+        total=Coalesce(
+            ExpressionWrapper(
+                Sum(F('sold') * F('retail_price')),
+                output_field=DecimalField(max_digits=10, decimal_places=2)
+            ),
+            Decimal('0.00')
+        )
+    )['total']
 
-        # Получаем книги с продажами
-        books_with_sales = []
-        for book in Book.objects.filter(sold__gt=0):
-            book.total_sale_value = book.sold * book.retail_price
-            books_with_sales.append(book)
+    # Получаем книги с продажами через аннотации
+    books = Book.objects.filter(sold__gt=0).annotate(
+        total_sale_value=ExpressionWrapper(
+            F('sold') * F('retail_price'),
+            output_field=DecimalField(max_digits=10, decimal_places=2)
+        )
+    ).order_by('-total_sale_value')
 
-        # Сортируем по убыванию стоимости
-        books_with_sales.sort(key=lambda x: x.total_sale_value, reverse=True)
-
-        return render(request, 'books/sales_value.html', {
-            'total_value': total_value,
-            'css': books_with_sales
-        })
-
-    except Exception as e:
-        # В случае ошибки возвращаем сообщение об ошибке
-        return render(request, 'books/error.html', {
-            'error_message': f"Ошибка при расчете стоимости продаж: {str(e)}"
-        })
+    return render(request, 'books/sales_value.html', {
+        'total_value': total_value,
+        'books': books
+    })
 
 def price_difference(request):
     book = Book.objects.annotate(
@@ -321,3 +326,4 @@ def profit_report(request):
         'genres_profit': genres_profit,
         'top_books': top_books
     })
+
