@@ -10,6 +10,7 @@
     </div>
 
     <form method="get" action="{% url 'book_list' %}" id="filter-form">
+        {% csrf_token %}
         <div class="search-form" style="margin-bottom: 20px;">
             <input type="text" name="q" placeholder="Поиск по названию, автору..." value="{{ search_query }}">
             <button type="submit">Найти</button>

@@ -1,0 +1,13 @@
+
+{
+  "title": "Test Book from Fixture",
+  "author": "Fixture Author",
+  "genre": 1,
+  "year": "2023",
+  "retail_price": "500.00",
+  "wholesale_price": "300.00",
+  "stock": "10",
+  "sold": "5",
+  "code": "TEST123",
+  "medium": "P"
+}

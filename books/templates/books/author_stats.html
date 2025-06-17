@@ -11,6 +11,8 @@
         <p class="stats-value">Прибыль: {{ most_profitable.total_profit }} ₽</p>
     </div>
     {% endif %}
+
+    {% csrf_token %}
     
     <table>
         <thead>

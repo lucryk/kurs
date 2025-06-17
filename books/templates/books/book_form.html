@@ -4,7 +4,8 @@
 <div class="card">
     <h2>{{ title }}</h2>
 
-    <form method="post">
+    <!-- Добавляем id="book-form" к тегу form -->
+    <form method="post" id="book-form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}

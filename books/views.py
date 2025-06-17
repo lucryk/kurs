@@ -224,6 +224,8 @@ def complete_order(request, order_id):
 
 
 # Добавление книги
+# books/views.py
+# books/views.py
 @login_required
 def add_book(request):
     if request.method == 'POST':
@@ -231,7 +233,14 @@ def add_book(request):
         if form.is_valid():
             book = form.save()
             messages.success(request, f'Книга "{book.title}" успешно добавлена!')
-            return redirect('book_list')
+            return redirect('book_list')  # Редирект после успешного сохранения
+        else:
+            # Добавьте логирование ошибок
+            print("Form errors:", form.errors)
+            return render(request, 'books/book_form.html', {
+                'form': form,
+                'title': 'Добавить книгу'
+            })
     else:
         form = BookForm()
 
