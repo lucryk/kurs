@@ -1,0 +1,35 @@
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Создать заказ на отсутствующую книгу</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.auto_id }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-primary">Создать заказ</button>
+        <a href="{% url 'missing_books' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

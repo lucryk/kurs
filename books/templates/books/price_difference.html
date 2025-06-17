@@ -1,0 +1,29 @@
+{% extends 'books/base.html' %}
+    {% load static %}
+{% block content %}
+<div class="card">
+    <h2>Книга с максимальной наценкой</h2>
+    
+    {% if book %}
+    <div class="book-card">
+        <h3>{{ book.title }}</h3>
+        <div class="book-meta">
+            <div><strong>Автор:</strong> {{ book.author }}</div>
+            <div><strong>Жанр:</strong> {{ book.genre.name }}</div>
+        </div>
+        
+        <div class="book-price">
+            Розничная цена: {{ book.retail_price }} ₽
+        </div>
+        <div class="book-price">
+            Оптовая цена: {{ book.wholesale_price }} ₽
+        </div>
+        <div class="stats-value">
+            Наценка: {{ book.price_difference }} ₽
+        </div>
+    </div>
+    {% else %}
+    <p>Данные отсутствуют</p>
+    {% endif %}
+</div>
+{% endblock %}

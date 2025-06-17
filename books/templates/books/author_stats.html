@@ -1,0 +1,38 @@
+{% extends 'books/base.html' %}
+{% load static %}
+{% block content %}
+<div class="card">
+    <h2>Статистика по авторам</h2>
+    
+    {% if most_profitable %}
+    <div class="stats-card">
+        <h3>Самый прибыльный автор</h3>
+        <p>{{ most_profitable.author }}</p>
+        <p class="stats-value">Прибыль: {{ most_profitable.total_profit }} ₽</p>
+    </div>
+    {% endif %}
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Автор</th>
+                <th>Продано книг</th>
+                <th>Общая прибыль</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for author in authors %}
+            <tr>
+                <td>{{ author.author }}</td>
+                <td>{{ author.total_sold }}</td>
+                <td>{{ author.total_profit }} ₽</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Данные отсутствуют</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'books/base.html' %}
+    {% load static %}
+{% block content %}
+<div class="card">
+    <h2>Управление жанрами</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="error">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn">Сохранить</button>
+        <a href="{% url 'book_list' %}" class="btn" style="background: #6c757d;">Отмена</a>
+    </form>
+    
+    <h3 style="margin-top: 30px;">Существующие жанры</h3>
+    
+    <ul>
+        {% for genre in genres %}
+        <li style="margin-bottom: 10px;">
+            {{ genre.name }}
+            <a href="{% url 'edit_genre' genre.id %}" class="btn" style="padding: 5px 10px;">Редактировать</a>
+            <a href="{% url 'delete_genre' genre.id %}" class="btn btn-danger" style="padding: 5px 10px;">Удалить</a>
+        </li>
+        {% empty %}
+        <li>Жанры не добавлены</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Каталог книг</h2>
+
+    <!-- Форма поиска -->
+    <form action="{% url 'book_list' %}" method="get" class="search-form">
+        <input type="text" name="q" placeholder="Поиск по названию, автору..." value="{{ search_query }}">
+        <button type="submit">Найти</button>
+    </form>
+
+    <!-- Фильтры -->
+    <div class="filters">
+        <div class="filter-group">
+            <label for="genre">Жанр:</label>
+            <select id="genre" name="genre" onchange="this.form.submit()">
+                <option value="">Все жанры</option>
+                {% for genre in genres %}
+                <option value="{{ genre.name }}"
+                    {% if genre.name == selected_genre %}selected{% endif %}>
+                    {{ genre.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="author">Автор:</label>
+            <select id="author" name="author" onchange="this.form.submit()">
+                <option value="">Все авторы</option>
+                {% for author in authors %}
+                <option value="{{ author }}"
+                    {% if author == selected_author %}selected{% endif %}>
+                    {{ author }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>&nbsp;</label>
+            <a href="{% url 'book_list' %}" class="btn btn-secondary">Сбросить фильтры</a>
+        </div>
+    </div>
+
+    <!-- Результаты -->
+    <div class="book-list">
+        {% for book in books %}
+        <div class="book-card">
+            <h3>{{ book.title }}</h3>
+            <div class="book-meta">
+                <div><strong>Автор:</strong> {{ book.author }}</div>
+                <div><strong>Год издания:</strong> {{ book.year }}</div>
+                <div class="genre-tag">{{ book.genre.name }}</div>
+            </div>
+
+            <div class="book-price">
+                Цена: {{ book.retail_price }} ₽
+            </div>
+
+            <div class="stock-info">
+                <span class="stock-amount">В наличии: {{ book.stock }}</span>
+                <span class="stock-sold">Продано: {{ book.sold }}</span>
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'edit_book' book.id %}" class="btn">Редактировать</a>
+                <a href="{% url 'delete_book' book.id %}" class="btn btn-danger">Удалить</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="book-card">
+            <h3>Книги не найдены</h3>
+            <p>Попробуйте изменить критерии поиска</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    <div class="pagination">
+        {% if books.has_previous %}
+            <a href="?page=1{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">&laquo; Первая</a>
+            <a href="?page={{ books.previous_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current">
+            Страница {{ books.number }} из {{ books.paginator.num_pages }}
+        </span>
+
+        {% if books.has_next %}
+            <a href="?page={{ books.next_page_number }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">Следующая</a>
+            <a href="?page={{ books.paginator.num_pages }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if selected_author %}&author={{ selected_author }}{% endif %}">Последняя &raquo;</a>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'add_book' %}" class="btn">Добавить новую книгу</a>
+    </div>
+</div>
+{% endblock %}

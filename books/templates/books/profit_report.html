@@ -1,0 +1,56 @@
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Отчет о прибыли</h2>
+    
+    <div class="stats-card">
+        <h3>Общая прибыль</h3>
+        <p class="stats-value">{{ total_profit }} ₽</p>
+    </div>
+    
+    <h3>Прибыль по жанрам</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Жанр</th>
+                <th>Прибыль</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in genres_profit %}
+            <tr>
+                <td>{{ item.genre.name }}</td>
+                <td>{{ item.total_profit }} ₽</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">Данные отсутствуют</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <h3>Самые прибыльные книги</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Книга</th>
+                <th>Прибыль</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in top_books %}
+            <tr>
+                <td>{{ book.title }} ({{ book.author }})</td>
+                <td>{{ book.profit }} ₽</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">Данные отсутствуют</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
